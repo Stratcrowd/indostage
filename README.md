@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# IndoStage website
 
-## Getting Started
+Official site for **IndoStage Creative & Production Pvt. Ltd.**: www.indostage.in
 
-First, run the development server:
+Built with Next.js (App Router), React and Tailwind CSS. Every page except the contact page is pre-rendered, so Google can read it.
+
+## Run locally
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev      # http://localhost:3000
+npm run build    # production build check
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Where to edit things
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| What | File |
+| --- | --- |
+| Phone, email, WhatsApp, social links, team, services text | `src/lib/site.ts` |
+| Page content | `src/app/<page>/page.tsx` |
+| Colours and fonts | `src/app/globals.css`, `src/app/layout.tsx` |
+| Images | `public/images/` (WebP) |
+| Share image for WhatsApp/LinkedIn | `src/app/opengraph-image.jpg` (regenerate with `node scripts/make-og.mjs`) |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Social icons appear in the footer as soon as you fill in their URLs under `site.social` in `src/lib/site.ts`.
 
-## Learn More
+## Contact form email
 
-To learn more about Next.js, take a look at the following resources:
+The form sends through [Resend](https://resend.com), which has a free tier. Until a key is added, the form asks visitors to email or WhatsApp instead.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Create a Resend account and verify the `indostage.in` domain (Resend shows the DNS records to add).
+2. In Vercel → Project → Settings → Environment Variables, add:
+   - `RESEND_API_KEY`: your Resend key
+   - `CONTACT_FROM`: e.g. `IndoStage Website <website@indostage.in>`
+   - `CONTACT_TO` (optional): defaults to `pradnya@indostage.in`
+3. Redeploy.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+See `.env.example`. Never commit real keys.
 
-## Deploy on Vercel
+## Deploy (GitHub → Vercel)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. **GitHub Desktop** → File → Add local repository → select this folder → **Publish repository** (keep it private if you like).
+2. **vercel.com** → Add New → Project → import that GitHub repo. It detects Next.js automatically, so just click Deploy.
+3. Check the `*.vercel.app` preview URL.
+4. In the Vercel project, open Settings → Domains → add `indostage.in` and `www.indostage.in`. If the old site is on another Vercel project, remove the domains from that project first.
+5. From now on, every push to GitHub redeploys automatically.
