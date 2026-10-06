@@ -4,6 +4,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { RevealObserver } from "@/components/RevealObserver";
 import { WhatsAppFloat } from "@/components/WhatsAppFloat";
+import { EventAnnouncement } from "@/components/EventAnnouncement";
 import { site } from "@/lib/site";
 import "./globals.css";
 
@@ -102,6 +103,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <main id="main">{children}</main>
         <Footer />
         <WhatsAppFloat />
+        <EventAnnouncement />
         <RevealObserver />
         <script
           type="application/ld+json"

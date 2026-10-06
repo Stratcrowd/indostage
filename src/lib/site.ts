@@ -218,3 +218,28 @@ export const reachOutReasons = [
 
 export const whatsappLink = (text: string) =>
   `${site.whatsapp}?text=${encodeURIComponent(text)}`;
+
+// Ravi Chary Crossing, 18 Oct 2026. Shared by the event page and the site-wide announcement.
+export const crossing = {
+  href: "/ravi-chary-crossing",
+  title: "Ravi Chary Crossing",
+  dateLabel: "Sunday, 18 October 2026",
+  time: "8:45 PM",
+  startISO: "2026-10-18T20:45:00+05:30",
+  // The announcement stops showing once the show day is over.
+  endISO: "2026-10-19T00:00:00+05:30",
+  venue: "Ravindra Natya Mandir",
+  area: "Prabhadevi, Mumbai",
+  entry: "FREE ENTRY",
+  enquiry: "+91 83698 45539",
+  enquiryHref: "tel:+918369845539",
+  enquiryWhatsapp: "https://wa.me/918369845539",
+  academy: "Ravi Chary’s Swar Sanskruti Music Academy",
+  artists: [
+    { name: "Ravi Chary", role: "Sitar", image: "/images/crossing/ravi.webp", pos: "50% 22%" },
+    { name: "Ojas Adhiya", role: "Tabla", image: "/images/crossing/ojas.webp", pos: "42% 30%" },
+    { name: "Gino Banks", role: "Drums", image: "/images/crossing/gino.webp", pos: "57% 15%" },
+    { name: "Sangeet Haldipur", role: "Keyboards · Composer", image: "/images/crossing/sangeet.webp", pos: "55% 20%" },
+    { name: "Sheldon D’Silva", role: "Bass Guitar", image: "/images/crossing/sheldon.webp", pos: "46% 20%" },
+  ],
+} as const;
