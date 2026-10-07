@@ -1,14 +1,13 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { crossing, site, whatsappLink } from "@/lib/site";
+import { crossing, site } from "@/lib/site";
+import { makePassToken } from "@/lib/pass-token";
 import { MAX_PER_BOOKING, bookPasses, normalisePhone, passesConfigured } from "@/lib/passes";
 
 export type PassState = {
-  status: "idle" | "error" | "full" | "whatsapp";
+  status: "idle" | "error" | "full";
   message?: string;
-  /** Set when there is no database: the booking is sent to us as a WhatsApp message instead. */
-  whatsapp?: string;
   errors?: Partial<Record<"name" | "phone" | "passes", string>>;
   values?: Record<string, string>;
 };
@@ -28,19 +27,9 @@ export async function requestPass(_prev: PassState, formData: FormData): Promise
   if (!Number.isInteger(passes) || passes < 1 || passes > MAX_PER_BOOKING) errors.passes = `Choose 1 to ${MAX_PER_BOOKING} passes.`;
   if (Object.keys(errors).length) return { status: "error", errors, values };
 
+  // No booking database: the pass details go in the link, and the visitor sends them to us on WhatsApp.
   if (!passesConfigured()) {
-    const text = [
-      `Hi ${site.name}! I'd like free passes for ${crossing.title} (${crossing.dateLabel}).`,
-      `Name: ${values.name}`,
-      `Mobile: ${phone}`,
-      `Passes: ${passes}`,
-    ].join("\n");
-    return {
-      status: "whatsapp",
-      message: "Opening WhatsApp… Just press send and we'll confirm your passes there.",
-      whatsapp: whatsappLink(text),
-      values,
-    };
+    redirect(`/pass/v/${makePassToken({ name: values.name, phone: phone!, passes, type: "general" })}?new=1`);
   }
 
   let result;

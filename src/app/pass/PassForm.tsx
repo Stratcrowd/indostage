@@ -1,18 +1,14 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useActionState } from "react";
 import { requestPass, type PassState } from "./actions";
 import { MAX_PER_BOOKING } from "@/lib/passes-config";
 
 const initial: PassState = { status: "idle" };
 
-export function PassForm({ source, viaWhatsApp }: { source: string; viaWhatsApp?: boolean }) {
+export function PassForm({ source }: { source: string }) {
   const [state, action, pending] = useActionState(requestPass, initial);
   const v = state.values ?? {};
-  // No booking database / email yet: the action hands back a prefilled WhatsApp message, so open it.
-  useEffect(() => {
-    if (state.status === "whatsapp" && state.whatsapp) window.location.href = state.whatsapp;
-  }, [state]);
 
   return (
     <form action={action} noValidate className="space-y-5">
@@ -53,15 +49,7 @@ export function PassForm({ source, viaWhatsApp }: { source: string; viaWhatsApp?
         {state.errors?.passes && <p className="mt-2 text-sm text-saffron">{state.errors.passes}</p>}
       </fieldset>
 
-      {state.status === "whatsapp" && state.whatsapp && (
-        <p role="status" className="rounded-xl border border-gold/40 bg-gold/10 px-4 py-3 text-sm text-ivory">
-          {state.message}{" "}
-          <a href={state.whatsapp} target="_blank" rel="noopener noreferrer" className="text-gold-soft underline underline-offset-4">
-            Tap here if WhatsApp didn&apos;t open.
-          </a>
-        </p>
-      )}
-      {state.status !== "whatsapp" && state.message && (
+      {state.message && (
         <p role="alert" className="rounded-xl border border-saffron/40 bg-saffron/10 px-4 py-3 text-sm text-ivory">
           {state.message}
         </p>
@@ -71,9 +59,7 @@ export function PassForm({ source, viaWhatsApp }: { source: string; viaWhatsApp?
         {pending ? "Booking your pass…" : "Get My Free Pass"}
       </button>
       <p className="text-center text-xs text-muted">
-        {viaWhatsApp
-          ? "We only use your number for this event. Your request opens in WhatsApp; just press send."
-          : "We only use your number for this event. Your pass appears on the next screen."}
+        We only use your number for this event. Your pass appears on the next screen.
       </p>
     </form>
   );

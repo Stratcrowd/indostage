@@ -235,6 +235,8 @@ export const crossing = {
   enquiry: "+91 83698 45539",
   enquiryHref: "tel:+918369845539",
   enquiryWhatsapp: "https://wa.me/918369845539",
+  // Pass types. The public /pass form gives out "general"; VVIP and VIP are issued by the team at /pass/issue.
+  passTypes: { general: "General", vip: "VIP", vvip: "VVIP" },
   academy: "Ravi Chary’s Swar Sanskruti Music Academy",
   artists: [
     { name: "Ravi Chary", role: "Sitar", image: "/images/crossing/ravi.webp", pos: "50% 22%" },
