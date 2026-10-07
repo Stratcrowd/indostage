@@ -111,7 +111,7 @@ export default async function PassPage({ searchParams }: { searchParams: Promise
                 {fewLeft ? <span className="text-saffron">Only {left} passes left.</span> : "Limited passes available."}
               </p>
               <div className="mt-6">
-                <PassForm source={source} />
+                <PassForm source={source} viaWhatsApp={!passesConfigured()} />
               </div>
             </>
           )}

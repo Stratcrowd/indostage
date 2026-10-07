@@ -1,10 +1,12 @@
 "use server";
 
-import { site } from "@/lib/site";
+import { site, whatsappLink } from "@/lib/site";
 
 export type ContactState = {
-  status: "idle" | "success" | "error";
+  status: "idle" | "success" | "error" | "whatsapp";
   message?: string;
+  /** Set when email isn't set up: the enquiry is sent to us as a WhatsApp message instead. */
+  whatsapp?: string;
   errors?: Partial<Record<"name" | "email" | "message", string>>;
   values?: Record<string, string>;
 };
@@ -37,10 +39,20 @@ export async function sendContact(
 
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
-    console.warn("[contact] RESEND_API_KEY is not set — message not sent:", values);
+    const text = [
+      `Hi ${site.name}! I'm contacting you from the website.`,
+      `Name: ${values.name}`,
+      `Email: ${values.email}`,
+      values.phone && `Phone: ${values.phone}`,
+      values.service && `Interested in: ${values.service}`,
+      `Message: ${values.message}`,
+    ]
+      .filter((l) => l !== "")
+      .join("\n");
     return {
-      status: "error",
-      message: `Our form is being set up. Please email us at ${site.email} or WhatsApp ${site.phone}.`,
+      status: "whatsapp",
+      message: "Opening WhatsApp… Just press send and we'll reply there.",
+      whatsapp: whatsappLink(text),
       values,
     };
   }

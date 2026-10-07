@@ -1,12 +1,14 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { crossing, site } from "@/lib/site";
+import { crossing, site, whatsappLink } from "@/lib/site";
 import { MAX_PER_BOOKING, bookPasses, normalisePhone, passesConfigured } from "@/lib/passes";
 
 export type PassState = {
-  status: "idle" | "error" | "full";
+  status: "idle" | "error" | "full" | "whatsapp";
   message?: string;
+  /** Set when there is no database: the booking is sent to us as a WhatsApp message instead. */
+  whatsapp?: string;
   errors?: Partial<Record<"name" | "phone" | "passes", string>>;
   values?: Record<string, string>;
 };
@@ -27,8 +29,18 @@ export async function requestPass(_prev: PassState, formData: FormData): Promise
   if (Object.keys(errors).length) return { status: "error", errors, values };
 
   if (!passesConfigured()) {
-    console.warn("[pass] DATABASE_URL is not set — booking not saved:", values);
-    return { status: "error", message: `Pass booking is being set up. Please WhatsApp ${crossing.enquiry} for your pass.`, values };
+    const text = [
+      `Hi ${site.name}! I'd like free passes for ${crossing.title} (${crossing.dateLabel}).`,
+      `Name: ${values.name}`,
+      `Mobile: ${phone}`,
+      `Passes: ${passes}`,
+    ].join("\n");
+    return {
+      status: "whatsapp",
+      message: "Opening WhatsApp… Just press send and we'll confirm your passes there.",
+      whatsapp: whatsappLink(text),
+      values,
+    };
   }
 
   let result;
