@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { Arrow, Divider, SectionHeading } from "@/components/ui";
 import { crossing, site } from "@/lib/site";
 
@@ -57,7 +58,7 @@ function Facts({ className = "" }: { className?: string }) {
   const items = [
     [crossing.dateLabel, crossing.time],
     [crossing.venue, crossing.area],
-    [crossing.entry, "No tickets needed"],
+    [crossing.entry, "Free pass required"],
   ];
   return (
     <dl className={`grid gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-3 ${className}`}>
@@ -112,11 +113,11 @@ export default function RaviCharyCrossingPage() {
           </p>
           <Facts className="mt-10 max-w-4xl" />
           <div className="mt-10 flex flex-wrap gap-4" data-reveal>
-            <a href="#lineup" className="btn-gold">
-              Meet the Artists <Arrow />
-            </a>
-            <a href={crossing.enquiryHref} className="btn-ghost">
-              Enquiries: {crossing.enquiry}
+            <Link href={crossing.passHref} className="btn-gold">
+              Get Free Passes <Arrow />
+            </Link>
+            <a href="#lineup" className="btn-ghost">
+              Meet the Artists
             </a>
           </div>
         </div>
@@ -179,15 +180,15 @@ export default function RaviCharyCrossingPage() {
           See You on <em className="text-gold-grad">18 October</em>
         </h2>
         <p className="mx-auto mt-6 max-w-2xl text-lg text-ivory/80" data-reveal>
-          {crossing.time} at {crossing.venue}, {crossing.area}. Entry is free.
+          {crossing.time} at {crossing.venue}, {crossing.area}. Entry is free with a pass: book yours in a few seconds.
         </p>
         <Facts className="mx-auto mt-10 max-w-4xl text-left" />
         <div className="mt-10 flex flex-wrap justify-center gap-4" data-reveal>
-          <a href={enquiryWhatsapp} target="_blank" rel="noopener noreferrer" className="btn-gold">
-            Enquire on WhatsApp <Arrow />
-          </a>
-          <a href={crossing.enquiryHref} className="btn-ghost">
-            Call {crossing.enquiry}
+          <Link href={crossing.passHref} className="btn-gold">
+            Get Free Passes <Arrow />
+          </Link>
+          <a href={enquiryWhatsapp} target="_blank" rel="noopener noreferrer" className="btn-ghost">
+            Enquire on WhatsApp
           </a>
         </div>
         <div className="mx-auto mt-16 max-w-4xl" data-reveal>

@@ -222,6 +222,7 @@ export const whatsappLink = (text: string) =>
 // Ravi Chary Crossing, 18 Oct 2026. Shared by the event page and the site-wide announcement.
 export const crossing = {
   href: "/ravi-chary-crossing",
+  passHref: "/pass",
   title: "Ravi Chary Crossing",
   dateLabel: "Sunday, 18 October 2026",
   time: "8:45 PM",

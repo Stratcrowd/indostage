@@ -16,7 +16,7 @@ export function EventAnnouncement() {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    if (pathname === crossing.href || Date.now() > Date.parse(crossing.endISO)) return;
+    if (pathname === crossing.href || pathname.startsWith(crossing.passHref) || Date.now() > Date.parse(crossing.endISO)) return;
     try {
       if (localStorage.getItem(STORAGE_KEY)) return;
     } catch {}
@@ -80,12 +80,12 @@ export function EventAnnouncement() {
           </p>
           <p className="mt-3 font-semibold tracking-[0.2em] text-gold uppercase">{crossing.entry}</p>
           <div className="mt-6 flex flex-wrap gap-3">
-            <Link href={crossing.href} onClick={dismiss} className="btn-gold">
-              View the Event <Arrow />
+            <Link href={crossing.passHref} onClick={dismiss} className="btn-gold">
+              Get Free Passes <Arrow />
             </Link>
-            <button type="button" onClick={dismiss} className="btn-ghost">
-              Maybe Later
-            </button>
+            <Link href={crossing.href} onClick={dismiss} className="btn-ghost">
+              View the Event
+            </Link>
           </div>
         </div>
       </div>
