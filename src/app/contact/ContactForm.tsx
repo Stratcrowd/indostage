@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import { sendContact, type ContactState } from "./actions";
 import { services } from "@/lib/site";
 
@@ -8,6 +8,10 @@ const initial: ContactState = { status: "idle" };
 
 export function ContactForm({ defaultService }: { defaultService?: string }) {
   const [state, action, pending] = useActionState(sendContact, initial);
+  // No booking database / email yet: the action hands back a prefilled WhatsApp message, so open it.
+  useEffect(() => {
+    if (state.status === "whatsapp" && state.whatsapp) window.location.href = state.whatsapp;
+  }, [state]);
 
   if (state.status === "success") {
     return (
@@ -65,6 +69,14 @@ export function ContactForm({ defaultService }: { defaultService?: string }) {
         error={state.errors?.message}
       />
 
+      {state.status === "whatsapp" && state.whatsapp && (
+        <p role="status" className="rounded-xl border border-gold/40 bg-gold/10 px-4 py-3 text-sm text-ivory">
+          {state.message}{" "}
+          <a href={state.whatsapp} target="_blank" rel="noopener noreferrer" className="text-gold-soft underline underline-offset-4">
+            Tap here if WhatsApp didn&apos;t open.
+          </a>
+        </p>
+      )}
       {state.status === "error" && state.message && (
         <p role="alert" className="rounded-xl border border-saffron/40 bg-saffron/10 px-4 py-3 text-sm text-ivory">
           {state.message}

@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { crossing, site } from "@/lib/site";
+import { makePassToken } from "@/lib/pass-token";
 import { MAX_PER_BOOKING, bookPasses, normalisePhone, passesConfigured } from "@/lib/passes";
 
 export type PassState = {
@@ -26,9 +27,9 @@ export async function requestPass(_prev: PassState, formData: FormData): Promise
   if (!Number.isInteger(passes) || passes < 1 || passes > MAX_PER_BOOKING) errors.passes = `Choose 1 to ${MAX_PER_BOOKING} passes.`;
   if (Object.keys(errors).length) return { status: "error", errors, values };
 
+  // No booking database: the pass details go in the link, and the visitor sends them to us on WhatsApp.
   if (!passesConfigured()) {
-    console.warn("[pass] DATABASE_URL is not set — booking not saved:", values);
-    return { status: "error", message: `Pass booking is being set up. Please WhatsApp ${crossing.enquiry} for your pass.`, values };
+    redirect(`/pass/v/${makePassToken({ name: values.name, phone: phone!, passes, type: "general" })}?new=1`);
   }
 
   let result;

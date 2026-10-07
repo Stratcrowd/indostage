@@ -132,3 +132,18 @@ body {
 .h-display {
   font-variant-numeric: lining-nums;
 }
+
+/* Printing a pass: only the page content, with its dark background and gold kept. */
+@media print {
+  body > :not(main) {
+    display: none !important;
+  }
+  html,
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .grain::after {
+    display: none;
+  }
+}
