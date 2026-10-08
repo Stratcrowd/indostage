@@ -20,13 +20,13 @@ export async function GET(request: Request) {
   const cell = (v: unknown) => `"${String(v ?? "").replace(/^[=+\-@]/, "'$&").replace(/"/g, '""')}"`;
   const total = rows.reduce((n, r) => n + Number(r.passes), 0);
   const csv = [
-    ["Pass No.", "Name", "Mobile", "Passes", "Source", "Booked at (IST)"].map(cell).join(","),
+    ["Pass No.", "Name", "WhatsApp", "Email", "Passes", "Source", "Booked at (IST)"].map(cell).join(","),
     ...rows.map((r) =>
-      [r.code, r.name, r.phone, r.passes, r.source, new Date(r.created_at).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })]
+      [r.code, r.name, r.phone, r.email, r.passes, r.source, new Date(r.created_at).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })]
         .map(cell)
         .join(","),
     ),
-    ["TOTAL", `${rows.length} bookings`, "", total, "", ""].map(cell).join(","),
+    ["TOTAL", `${rows.length} bookings`, "", "", total, "", ""].map(cell).join(","),
   ].join("\r\n");
 
   return new Response("﻿" + csv, {

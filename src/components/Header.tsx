@@ -2,14 +2,20 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { Logo } from "./Logo";
-import { nav } from "@/lib/site";
+import { crossing, nav } from "@/lib/site";
+
+const noSubscribe = () => () => {};
 
 export function Header() {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  // Free-pass link for Ravi Chary Crossing; disappears once the show day is over.
+  // The page is prerendered with the link; the browser drops it after the show.
+  const passLive = useSyncExternalStore(noSubscribe, () => Date.now() < Date.parse(crossing.endISO), () => true);
+  const showPass = passLive && !pathname.startsWith(crossing.passHref);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -64,7 +70,24 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-3">
-          <Link href="/contact" className="btn-gold hidden !px-5 !py-2.5 sm:inline-flex">
+          {showPass && (
+            <Link
+              href={crossing.passHref}
+              onClick={() => setOpen(false)}
+              className="inline-flex items-center gap-2 rounded-full border border-gold bg-gold/15 px-3.5 py-2 text-xs font-semibold tracking-wide text-gold-soft uppercase transition-colors hover:bg-gold hover:text-ink motion-safe:animate-flash sm:px-4 sm:text-sm"
+            >
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full rounded-full bg-saffron opacity-75 motion-safe:animate-ping" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-saffron" />
+              </span>
+              Free Pass
+            </Link>
+          )}
+          <Link
+            href="/contact"
+            // Small laptops can't fit the full menu, Free Pass and this button on one line.
+            className={`btn-gold hidden !px-5 !py-2.5 sm:inline-flex ${showPass ? "lg:hidden xl:inline-flex" : ""}`}
+          >
             Book a Show
           </Link>
           <button

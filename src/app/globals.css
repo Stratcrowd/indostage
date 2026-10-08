@@ -18,6 +18,7 @@
 
   --animate-marquee: marquee 40s linear infinite;
   --animate-slow-zoom: slow-zoom 24s ease-out both;
+  --animate-flash: flash 1.6s ease-in-out infinite;
 
   @keyframes marquee {
     to {
@@ -30,6 +31,16 @@
     }
     to {
       transform: scale(1);
+    }
+  }
+  /* Header "Free Pass" pill: a gold ring pulses out from it. */
+  @keyframes flash {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 rgb(214 165 79 / 0.6);
+    }
+    60% {
+      box-shadow: 0 0 0 10px rgb(214 165 79 / 0);
     }
   }
 }

@@ -232,9 +232,9 @@ export const crossing = {
   venue: "Ravindra Natya Mandir",
   area: "Prabhadevi, Mumbai",
   entry: "FREE ENTRY",
-  enquiry: "+91 83698 45539",
-  enquiryHref: "tel:+918369845539",
-  enquiryWhatsapp: "https://wa.me/918369845539",
+  enquiry: "+91 83698 45536",
+  enquiryHref: "tel:+918369845536",
+  enquiryWhatsapp: "https://wa.me/918369845536",
   academy: "Ravi Chary’s Swar Sanskruti Music Academy",
   artists: [
     { name: "Ravi Chary", role: "Sitar", image: "/images/crossing/ravi.webp", pos: "50% 22%" },

@@ -39,16 +39,21 @@ export default async function PassPage({ searchParams }: { searchParams: Promise
   const fewLeft = left !== null && left > 0 && left <= passLimit() * 0.2;
 
   return (
-    <section className="grain relative isolate overflow-hidden pt-32 pb-24 sm:pt-36">
+    <section className="grain relative isolate overflow-hidden pt-24 pb-16 sm:pt-36 sm:pb-24">
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,rgba(107,26,26,0.55),transparent_60%)]" />
-      {/* Mobile order: heading, form, details. Desktop: heading + details left, form right. */}
-      <div className="container-x grid grid-cols-1 gap-10 lg:grid-cols-[1.1fr_1fr] lg:items-start lg:gap-x-12">
+      {/* Mobile: short heading, one-line event details, then the form. Desktop: heading + details left, form right. */}
+      <div className="container-x grid grid-cols-1 gap-6 sm:gap-10 lg:grid-cols-[1.1fr_1fr] lg:items-start lg:gap-x-12">
         <div className="min-w-0 lg:col-start-1">
           <p className="kicker">Free entry · Passes required</p>
-          <h1 className="h-display mt-5 text-5xl sm:text-7xl">
+          <h1 className="h-display mt-3 text-4xl sm:mt-5 sm:text-7xl">
             Get Your <em className="text-gold-grad">Free Pass</em>
           </h1>
-          <p className="mt-6 max-w-xl text-lg leading-relaxed text-ivory/80">
+          <p className="mt-3 text-sm leading-relaxed text-ivory/80 sm:hidden">
+            {crossing.dateLabel.replace(" 2026", "")} · {crossing.time}
+            <br />
+            {crossing.venue}, {crossing.area}
+          </p>
+          <p className="mt-6 hidden max-w-xl text-lg leading-relaxed text-ivory/80 sm:block">
             <Link href={crossing.href} className="text-gold-soft underline decoration-gold/40 underline-offset-4 hover:text-gold">
               Ravi Chary Crossing
             </Link>
@@ -56,7 +61,7 @@ export default async function PassPage({ searchParams }: { searchParams: Promise
           </p>
         </div>
 
-        <div className="order-last min-w-0 lg:order-none lg:col-start-1">
+        <div className="order-last hidden min-w-0 sm:block lg:order-none lg:col-start-1">
 
           <dl className="grid max-w-xl gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-2">
             {[
@@ -91,7 +96,7 @@ export default async function PassPage({ searchParams }: { searchParams: Promise
           </ol>
         </div>
 
-        <div className="min-w-0 rounded-3xl border border-line bg-ink-2/90 p-6 shadow-2xl sm:p-8 lg:sticky lg:top-28 lg:col-start-2 lg:row-span-2 lg:row-start-1">
+        <div className="min-w-0 rounded-3xl border border-line bg-ink-2/90 p-5 shadow-2xl sm:p-8 lg:sticky lg:top-28 lg:col-start-2 lg:row-span-2 lg:row-start-1">
           {closed ? (
             <div className="py-6 text-center">
               <p className="font-display text-4xl text-gold-soft">Passes are closed</p>
@@ -105,9 +110,9 @@ export default async function PassPage({ searchParams }: { searchParams: Promise
             </div>
           ) : (
             <>
-              <h2 className="font-display text-3xl text-ivory">Book your passes</h2>
+              <h2 className="font-display text-2xl text-ivory sm:text-3xl">Book your passes</h2>
               <p className="mt-2 text-sm text-muted">
-                Up to {MAX_PER_BOOKING} passes per mobile number.{" "}
+                Up to {MAX_PER_BOOKING} passes per WhatsApp number.{" "}
                 {fewLeft ? <span className="text-saffron">Only {left} passes left.</span> : "Limited passes available."}
               </p>
               <div className="mt-6">

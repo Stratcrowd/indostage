@@ -11,7 +11,7 @@ export function PassForm({ source }: { source: string }) {
   const v = state.values ?? {};
 
   return (
-    <form action={action} noValidate className="space-y-5">
+    <form action={action} noValidate className="space-y-4 sm:space-y-5">
       {/* Honeypot */}
       <div className="hidden" aria-hidden>
         <label>
@@ -22,14 +22,25 @@ export function PassForm({ source }: { source: string }) {
 
       <Field label="Full Name" name="name" autoComplete="name" defaultValue={v.name} error={state.errors?.name} />
       <Field
-        label="Mobile Number"
+        label="WhatsApp Number"
         name="phone"
         type="tel"
         inputMode="tel"
         autoComplete="tel"
-        placeholder="10-digit mobile number"
+        placeholder="10-digit WhatsApp number"
         defaultValue={v.phone}
         error={state.errors?.phone}
+      />
+      <Field
+        label="Email"
+        name="email"
+        type="email"
+        inputMode="email"
+        autoComplete="email"
+        placeholder="Optional"
+        optional
+        defaultValue={v.email}
+        error={state.errors?.email}
       />
 
       <fieldset>
@@ -59,7 +70,7 @@ export function PassForm({ source }: { source: string }) {
         {pending ? "Booking your pass…" : "Get My Free Pass"}
       </button>
       <p className="text-center text-xs text-muted">
-        We only use your number for this event. Your pass appears on the next screen.
+        We only use your details for this event. Your pass appears on the next screen.
       </p>
     </form>
   );
@@ -69,28 +80,30 @@ function Field({
   label,
   name,
   type = "text",
+  optional = false,
   error,
   ...rest
 }: {
   label: string;
   name: string;
   type?: string;
+  optional?: boolean;
   error?: string;
   defaultValue?: string;
   autoComplete?: string;
   placeholder?: string;
-  inputMode?: "tel";
+  inputMode?: "tel" | "email";
 }) {
   return (
     <div>
       <label htmlFor={name} className="mb-2 block text-sm text-ivory/80">
-        {label} <span className="text-gold">*</span>
+        {label} {optional ? <span className="text-muted">(optional)</span> : <span className="text-gold">*</span>}
       </label>
       <input
         id={name}
         name={name}
         type={type}
-        required
+        required={!optional}
         aria-invalid={!!error || undefined}
         aria-describedby={error ? `${name}-error` : undefined}
         className={`w-full rounded-xl border bg-ink px-4 py-3.5 text-ivory placeholder:text-muted/60 outline-none transition focus:border-gold ${
