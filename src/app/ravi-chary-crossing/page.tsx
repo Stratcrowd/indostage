@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { PartnerLogos, SpecialGuest, Tribute } from "@/components/Crossing";
 import { Arrow, Divider, SectionHeading } from "@/components/ui";
 import { crossing, site } from "@/lib/site";
 
 const description =
-  "Indian roots meet jazz freedom. Ravi Chary (sitar), Ojas Adhiya (tabla), Gino Banks (drums), Sangeet Haldipur (keyboards) and Sheldon D’Silva (bass) live at Ravindra Natya Mandir, Mumbai, on Sunday 18 October 2026 at 8:45 PM. Free entry.";
+  "Indian roots meet jazz freedom. Ravi Chary (sitar), Ojas Adhiya (tabla), Gino Banks (drums), Sangeet Haldipur (keyboards) and Sheldon D’Silva (bass), with special guest Merlin D’Souza, live at Ravindra Natya Mandir, Mumbai, on Sunday 18 October 2026 at 8:45 PM. A tribute to Late Pt. Prabhakar Chari in his birth-centenary year. Free entry.";
 
 export const metadata: Metadata = {
   title: "Ravi Chary Crossing — Live, 18 October 2026",
@@ -47,7 +48,7 @@ const eventJsonLd = {
       addressCountry: "IN",
     },
   },
-  performer: crossing.artists.map((a) => ({ "@type": "Person", name: a.name })),
+  performer: [...crossing.artists, crossing.guest].map((a) => ({ "@type": "Person", name: a.name })),
   organizer: [
     { "@type": "Organization", name: site.legalName, url: site.url },
     { "@type": "Organization", name: crossing.academy },
@@ -69,21 +70,6 @@ function Facts({ className = "" }: { className?: string }) {
         </div>
       ))}
     </dl>
-  );
-}
-
-function PartnerLogos() {
-  return (
-    <div className="flex flex-col items-center justify-center gap-6 rounded-2xl bg-ivory px-6 py-8 sm:flex-row sm:gap-12">
-      <div className="relative h-16 w-56 sm:h-20 sm:w-64">
-        <Image src="/images/crossing/logo-indostage.webp" alt="IndoStage Creation & Production Pvt. Ltd." fill sizes="256px" className="object-contain" />
-      </div>
-      <span className="font-display text-lg text-[#7a5a45] italic">in association with</span>
-      {/* The academy mark is taller than the IndoStage wordmark, so its box is taller for equal visual weight. */}
-      <div className="relative h-20 w-56 sm:h-24 sm:w-64">
-        <Image src="/images/crossing/logo-swar-sanskruti.webp" alt={crossing.academy} fill sizes="256px" className="object-contain" />
-      </div>
-    </div>
   );
 }
 
@@ -156,6 +142,7 @@ export default function RaviCharyCrossingPage() {
               </li>
             ))}
           </ul>
+          <SpecialGuest className="mx-auto mt-10 max-w-xl" />
         </div>
       </section>
 
@@ -169,10 +156,12 @@ export default function RaviCharyCrossingPage() {
           </p>
           <p className="text-muted">
             The evening is dedicated to the memory of Late Pt. Prabhakar Chari, Ravi Chary&apos;s
-            father and guru.
+            father and guru, in his Janma Shatabdi (birth-centenary) year.
           </p>
         </div>
       </section>
+
+      <Tribute />
 
       <section className="container-x pb-24 text-center lg:pb-32">
         <Divider />

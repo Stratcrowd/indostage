@@ -9,16 +9,17 @@ import { Arrow } from "./ui";
 
 const STORAGE_KEY = "indostage:announce:ravi-chary-crossing-2026";
 
-// Site-wide popup for the upcoming show. Hidden on the event page itself, after the visitor
-// dismisses it, and once the show day is over.
+// Site-wide popup for the upcoming show, shown on every visit. Closing it hides it for the rest of
+// that visit (sessionStorage), so it comes back next time. Never shown on the event or pass pages,
+// or after the show day.
 export function EventAnnouncement() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    if (pathname === crossing.href || pathname.startsWith(crossing.passHref) || Date.now() > Date.parse(crossing.endISO)) return;
+    if (pathname === crossing.href || pathname.startsWith(crossing.passHref) || pathname.startsWith("/admin") || Date.now() > Date.parse(crossing.endISO)) return;
     try {
-      if (localStorage.getItem(STORAGE_KEY)) return;
+      if (sessionStorage.getItem(STORAGE_KEY)) return;
     } catch {}
     const t = window.setTimeout(() => setOpen(true), 1200);
     return () => window.clearTimeout(t);
@@ -34,7 +35,7 @@ export function EventAnnouncement() {
   function dismiss() {
     setOpen(false);
     try {
-      localStorage.setItem(STORAGE_KEY, "1");
+      sessionStorage.setItem(STORAGE_KEY, "1");
     } catch {}
   }
 
@@ -77,6 +78,9 @@ export function EventAnnouncement() {
             {crossing.dateLabel} · {crossing.time}
             <br />
             {crossing.venue}, {crossing.area}
+          </p>
+          <p className="mt-3 text-sm text-muted">
+            With special guest {crossing.guest.name} · In memory of {crossing.tribute.name}, {crossing.tribute.centenary}
           </p>
           <p className="mt-3 font-semibold tracking-[0.2em] text-gold uppercase">{crossing.entry}</p>
           <div className="mt-6 flex flex-wrap gap-3">

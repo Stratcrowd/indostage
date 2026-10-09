@@ -56,4 +56,14 @@ await sharp({ create: { width: W, height: H, channels: 3, background: "#0c0806" 
   .composite(tiles.map((input, i) => ({ input, left: i * strip, top: 0 })))
   .jpeg({ quality: 85, mozjpeg: true }).toFile(path.join(outDir, "share.jpg"));
 
+// Special guest Merlin D'Souza, and the tribute photos of Late Pt. Prabhakar Chari (Janma Shatabdi, 1926–2026)
+// from the family archive in "new photos".
+await sharp(path.join(dataDir, "Merlin MD.jpg")).rotate().resize(1200, 1200, { fit: "inside" })
+  .webp({ quality: 80 }).toFile(path.join(outDir, "merlin.webp"));
+const archive = path.join(root, "new photos");
+await sharp(path.join(archive, "Late Pt. Prabhakar Chari.JPG.jpeg")).rotate().resize(800, 1000, { fit: "inside" })
+  .grayscale().webp({ quality: 70 }).toFile(path.join(outDir, "prabhakar-chari.webp"));
+await sharp(path.join(archive, "Felicitated by Gyani Zail Singh Ex President of India.jpg.jpeg")).rotate()
+  .resize(1400, 1000, { fit: "inside" }).webp({ quality: 80 }).toFile(path.join(outDir, "prabhakar-chari-president.webp"));
+
 for (const f of fs.readdirSync(outDir)) console.log(f, Math.round(fs.statSync(path.join(outDir, f)).size / 1024), "KB");

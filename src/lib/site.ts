@@ -243,4 +243,14 @@ export const crossing = {
     { name: "Sangeet Haldipur", role: "Keyboards · Composer", image: "/images/crossing/sangeet.webp", pos: "55% 20%" },
     { name: "Sheldon D’Silva", role: "Bass Guitar", image: "/images/crossing/sheldon.webp", pos: "46% 20%" },
   ],
+  guest: { name: "Merlin D’Souza", role: "Composer · Pianist · Music Director", image: "/images/crossing/merlin.webp", pos: "50% 18%" },
+  // The evening is in remembrance of Ravi Chary's father and guru, in his birth-centenary year.
+  tribute: {
+    name: "Late Pt. Prabhakar Chari",
+    years: "1926 – 2026",
+    centenary: "Janma Shatabdi Varsha",
+    born: "1 November 1926",
+    image: "/images/crossing/prabhakar-chari.webp",
+    felicitation: "/images/crossing/prabhakar-chari-president.webp",
+  },
 } as const;

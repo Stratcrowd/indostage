@@ -1,19 +1,10 @@
+import { askForLogin, isAdmin } from "@/lib/admin-auth";
 import { allPasses } from "@/lib/passes";
 
-// Booking list as CSV (opens in Excel / Google Sheets). The browser asks for a password:
-// any username, password = PASSES_ADMIN_PASSWORD from Vercel.
+// Booking list as CSV (opens in Excel / Google Sheets). Same login as /admin: any username,
+// password = PASSES_ADMIN_PASSWORD from Vercel.
 export async function GET(request: Request) {
-  const password = process.env.PASSES_ADMIN_PASSWORD;
-  let given = "";
-  try {
-    given = atob((request.headers.get("authorization") ?? "").replace(/^Basic /, "")).split(":").slice(1).join(":");
-  } catch {}
-  if (!password || given !== password) {
-    return new Response("Password required", {
-      status: 401,
-      headers: { "WWW-Authenticate": 'Basic realm="IndoStage passes"' },
-    });
-  }
+  if (!isAdmin(request.headers.get("authorization"))) return askForLogin();
 
   const rows = await allPasses();
   // Quote every cell, and stop Excel treating a name like "=SUM(...)" as a formula.
