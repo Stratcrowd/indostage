@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { headers } from "next/headers";
-import { isAdmin } from "@/lib/admin-auth";
+import { redirect } from "next/navigation";
+import { currentAdmin } from "@/lib/admin-auth";
 import { allPasses, passLimit, passesConfigured } from "@/lib/passes";
+import { logout } from "./login/actions";
 
 export const metadata: Metadata = {
   title: "Admin — Free Pass Bookings",
@@ -13,11 +14,10 @@ type Row = { code: string; name: string; phone: string; email: string | null; pa
 const ist = (d: string) =>
   new Date(d).toLocaleString("en-IN", { timeZone: "Asia/Kolkata", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
 
-// IndoStage admin: every free-pass booking for Ravi Chary Crossing. src/proxy.ts asks for the login first.
+// IndoStage admin: every free-pass booking for Ravi Chary Crossing. Login at /admin/login.
 export default async function AdminPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
-  if (!isAdmin((await headers()).get("authorization"))) {
-    return <p className="container-x pt-40 pb-24 text-ivory/80">Login required.</p>;
-  }
+  const admin = await currentAdmin();
+  if (!admin) redirect("/admin/login");
 
   const q = ((await searchParams).q ?? "").trim().toLowerCase();
   let rows: Row[] = [];
@@ -51,11 +51,16 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
       <p className="kicker">IndoStage Admin</p>
       <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
         <h1 className="h-display text-4xl sm:text-5xl">Free Pass Bookings</h1>
-        <a href="/api/passes" className="btn-gold !px-5 !py-2.5">
-          Download Excel / CSV
-        </a>
+        <div className="flex flex-wrap items-center gap-3">
+          <a href="/api/passes" className="btn-gold !px-5 !py-2.5">
+            Download Excel / CSV
+          </a>
+          <form action={logout}>
+            <button className="btn-ghost !px-5 !py-2.5">Log Out</button>
+          </form>
+        </div>
       </div>
-      <p className="mt-2 text-sm text-muted">Ravi Chary Crossing · 18 October 2026</p>
+      <p className="mt-2 text-sm text-muted">Ravi Chary Crossing · 18 October 2026 · Logged in as {admin}</p>
 
       {error ? (
         <p className="mt-8 rounded-xl border border-saffron/40 bg-saffron/10 px-4 py-3 text-ivory">{error}</p>

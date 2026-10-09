@@ -1,10 +1,9 @@
-import { askForLogin, isAdmin } from "@/lib/admin-auth";
+import { currentAdmin } from "@/lib/admin-auth";
 import { allPasses } from "@/lib/passes";
 
-// Booking list as CSV (opens in Excel / Google Sheets). Same login as /admin: any username,
-// password = PASSES_ADMIN_PASSWORD from Vercel.
+// Booking list as CSV (opens in Excel / Google Sheets). Needs the /admin login.
 export async function GET(request: Request) {
-  if (!isAdmin(request.headers.get("authorization"))) return askForLogin();
+  if (!(await currentAdmin())) return Response.redirect(new URL("/admin/login", request.url), 303);
 
   const rows = await allPasses();
   // Quote every cell, and stop Excel treating a name like "=SUM(...)" as a formula.

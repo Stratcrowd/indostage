@@ -20,7 +20,7 @@ export type Pass = {
 let sql: NeonQueryFunction<false, false> | undefined;
 let ready: Promise<unknown> | undefined;
 
-async function db() {
+export async function db() {
   if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL is not set");
   const q = (sql ??= neon(process.env.DATABASE_URL));
   // DDL can't take bind parameters, so the (constant) limit is written into the statement.
