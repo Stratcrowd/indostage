@@ -122,7 +122,7 @@ export default async function PassPage({ searchParams }: { searchParams: Promise
             <>
               <h2 className="font-display text-2xl text-ivory sm:text-3xl">Book your passes</h2>
               <p className="mt-2 text-sm text-muted">
-                Up to {MAX_PER_BOOKING} passes per WhatsApp number.{" "}
+                Up to {MAX_PER_BOOKING} passes per WhatsApp number. Seats are first come, first served.{" "}
                 {fewLeft ? <span className="text-saffron">Only {left} passes left.</span> : "Limited passes available."}
               </p>
               <div className="mt-6">
@@ -171,7 +171,7 @@ export default async function PassPage({ searchParams }: { searchParams: Promise
         ))}
       </ol>
       <p className="mx-auto mt-6 max-w-2xl text-sm text-muted">
-        Entry is free. Up to {MAX_PER_BOOKING} passes per WhatsApp number. Questions? Call or WhatsApp{" "}
+        Entry is free and seats are first come, first served. Up to {MAX_PER_BOOKING} passes per WhatsApp number. Questions? Call or WhatsApp{" "}
         <a href={crossing.enquiryHref} className="text-gold">
           {crossing.enquiry}
         </a>
