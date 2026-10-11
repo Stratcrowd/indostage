@@ -5,6 +5,7 @@ import { currentAdmin } from "@/lib/admin-auth";
 import { allPasses, passLimit, passesConfigured } from "@/lib/passes";
 import { isTier, tierInfo, type Tier } from "@/lib/passes-config";
 import { crossing, site } from "@/lib/site";
+import { DeletePassButton } from "./DeletePassButton";
 import { IssuePassForm } from "./IssuePassForm";
 import { logout } from "./login/actions";
 
@@ -148,7 +149,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
             <table className="w-full min-w-[900px] text-left text-sm">
               <thead className="bg-ink-2 text-xs tracking-[0.15em] text-muted uppercase">
                 <tr>
-                  {["Created", "Type", "Name", "WhatsApp", "Email", "Admits", "Pass no.", "Source"].map((h) => (
+                  {["Created", "Type", "Name", "WhatsApp", "Email", "Admits", "Pass no.", "Source", ""].map((h) => (
                     <th key={h} className="px-4 py-3 font-medium">
                       {h}
                     </th>
@@ -190,11 +191,14 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                       </a>
                     </td>
                     <td className="px-4 py-3 text-xs text-muted">{r.source || "Website"}</td>
+                    <td className="px-4 py-3 text-right">
+                      <DeletePassButton code={r.code} name={r.name} passes={r.passes} />
+                    </td>
                   </tr>
                 ))}
                 {!shown.length && (
                   <tr>
-                    <td colSpan={8} className="px-4 py-10 text-center text-muted">
+                    <td colSpan={9} className="px-4 py-10 text-center text-muted">
                       {q || tierFilter ? "No passes match." : "No passes yet."}
                     </td>
                   </tr>

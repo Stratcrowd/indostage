@@ -137,6 +137,14 @@ export async function getPass(code: string): Promise<Pass | null> {
   return (row as Pass) ?? null;
 }
 
+/** Admin-only: removes a pass for good. Its link stops working and a general pass frees its seats. */
+export async function deletePass(code: string) {
+  if (!/^RCC-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(code)) return false;
+  const sql = await db();
+  const rows = await sql`DELETE FROM crossing_passes WHERE code = ${code} RETURNING code`;
+  return rows.length > 0;
+}
+
 export async function allPasses() {
   const sql = await db();
   return sql`SELECT code, tier, name, title, phone, email, passes, source, created_at FROM crossing_passes ORDER BY created_at`;

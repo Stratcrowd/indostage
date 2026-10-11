@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { currentAdmin } from "@/lib/admin-auth";
-import { bookPasses, issueInvitation, normalisePhone } from "@/lib/passes";
+import { bookPasses, deletePass, issueInvitation, normalisePhone } from "@/lib/passes";
 import { MAX_PER_BOOKING, MAX_PER_INVITE, isTier, type Tier } from "@/lib/passes-config";
 
 export type IssueState = {
@@ -45,4 +45,17 @@ export async function issuePass(_prev: IssueState, form: FormData): Promise<Issu
     console.error("[admin] issue pass failed", e);
     return { error: "Could not save the pass. Try again in a minute.", values };
   }
+}
+
+/** Admin-only: delete one pass (from the Delete button in the All Passes table). */
+export async function removePass(form: FormData) {
+  const admin = await currentAdmin();
+  if (!admin) return;
+  const code = String(form.get("code") ?? "");
+  try {
+    if (await deletePass(code)) console.info(`[admin] ${admin} deleted pass ${code}`);
+  } catch (e) {
+    console.error("[admin] delete pass failed", e);
+  }
+  revalidatePath("/admin");
 }
