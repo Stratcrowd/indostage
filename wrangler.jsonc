@@ -1,0 +1,16 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "indostage",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-11-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
+  "services": [{ "binding": "WORKER_SELF_REFERENCE", "service": "indostage" }],
+  // Passes and the admin login (src/lib/d1.ts). Replaced Neon Postgres in Nov 2026.
+  "d1_databases": [
+    { "binding": "DB", "database_name": "indostage", "database_id": "b4b4a46a-3b27-40bc-8040-6865a0f324ad" }
+  ],
+  "observability": { "enabled": true },
+  "workers_dev": true,
+  "preview_urls": false
+}

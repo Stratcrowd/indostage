@@ -1,11 +1,11 @@
-// IndoStage admin login: one admin account (username + password) stored in Postgres, with
+// IndoStage admin login: one admin account (username + password) stored in D1 (./d1.ts), with
 // login sessions kept as hashed random tokens in an httpOnly cookie.
 // The account is created, and its password reset, on /admin/login with a setup code:
-// the PASSES_ADMIN_PASSWORD value from Vercel, which only the site owner can see or change.
+// the PASSES_ADMIN_PASSWORD secret on the Cloudflare Worker, which only the site owner can see or change.
 import { createHash, randomBytes, scrypt, timingSafeEqual } from "node:crypto";
 import { promisify } from "node:util";
 import { cookies } from "next/headers";
-import { db } from "./passes";
+import { d1, nowIso } from "./d1";
 
 const scryptAsync = promisify(scrypt) as (pw: string, salt: Buffer, len: number) => Promise<Buffer>;
 
@@ -14,32 +14,8 @@ import { SESSION_COOKIE } from "./admin-cookie";
 export { SESSION_COOKIE };
 const SESSION_DAYS = 30;
 
-let ready: Promise<unknown> | undefined;
-async function adminDb() {
-  const sql = await db();
-  ready ??= sql
-    .query(
-      `CREATE TABLE IF NOT EXISTS admin_users (
-        id SERIAL PRIMARY KEY,
-        username TEXT NOT NULL UNIQUE,
-        password_hash TEXT NOT NULL,
-        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-      )`,
-    )
-    .then(() =>
-      sql.query(`CREATE TABLE IF NOT EXISTS admin_sessions (
-        token_hash TEXT PRIMARY KEY,
-        user_id INT NOT NULL REFERENCES admin_users(id) ON DELETE CASCADE,
-        expires_at TIMESTAMPTZ NOT NULL
-      )`),
-    )
-    .catch((e) => {
-      ready = undefined;
-      throw e;
-    });
-  await ready;
-  return sql;
-}
+// Tables are created in ./d1.ts.
+const adminDb = d1;
 
 const sha256 = (s: string) => createHash("sha256").update(s).digest("hex");
 
@@ -65,22 +41,29 @@ export function setupCodeMatches(code: string) {
 export const setupCodeConfigured = () => Boolean(process.env.PASSES_ADMIN_PASSWORD);
 
 export async function adminExists() {
-  const sql = await adminDb();
-  const [row] = await sql`SELECT COUNT(*)::int AS n FROM admin_users`;
-  return row.n > 0;
+  const db = await adminDb();
+  const row = await db.prepare(`SELECT COUNT(*) AS n FROM admin_users`).first<{ n: number }>();
+  return Number(row?.n ?? 0) > 0;
 }
 
 /** Creates the admin account, or replaces it (password reset). Logs every device out. */
 export async function setAdminAccount(username: string, password: string) {
-  const sql = await adminDb();
+  const db = await adminDb();
   const hash = await hashPassword(password);
-  await sql`DELETE FROM admin_users`;
-  await sql`INSERT INTO admin_users (username, password_hash) VALUES (${username}, ${hash})`;
+  // Sessions are removed with the user (D1 does not enforce ON DELETE CASCADE by default).
+  await db.batch([
+    db.prepare(`DELETE FROM admin_sessions`),
+    db.prepare(`DELETE FROM admin_users`),
+    db.prepare(`INSERT INTO admin_users (username, password_hash) VALUES (?1, ?2)`).bind(username, hash),
+  ]);
 }
 
 export async function checkLogin(username: string, password: string): Promise<number | null> {
-  const sql = await adminDb();
-  const [user] = await sql`SELECT id, password_hash FROM admin_users WHERE lower(username) = lower(${username})`;
+  const db = await adminDb();
+  const user = await db
+    .prepare(`SELECT id, password_hash FROM admin_users WHERE lower(username) = lower(?1)`)
+    .bind(username)
+    .first<{ id: number; password_hash: string }>();
   // Hash even when the username is wrong, so timing doesn't reveal which part failed.
   const ok = await passwordMatches(password, user?.password_hash ?? `${"0".repeat(32)}:${"0".repeat(128)}`);
   return user && ok ? (user.id as number) : null;
@@ -88,11 +71,13 @@ export async function checkLogin(username: string, password: string): Promise<nu
 
 /** Starts a session for the user and sets the cookie. Server Functions only. */
 export async function startSession(userId: number) {
-  const sql = await adminDb();
+  const db = await adminDb();
   const token = randomBytes(32).toString("base64url");
   const expires = new Date(Date.now() + SESSION_DAYS * 86400_000);
-  await sql`DELETE FROM admin_sessions WHERE expires_at < now()`;
-  await sql`INSERT INTO admin_sessions (token_hash, user_id, expires_at) VALUES (${sha256(token)}, ${userId}, ${expires.toISOString()})`;
+  await db.batch([
+    db.prepare(`DELETE FROM admin_sessions WHERE expires_at < ?1`).bind(nowIso()),
+    db.prepare(`INSERT INTO admin_sessions (token_hash, user_id, expires_at) VALUES (?1, ?2, ?3)`).bind(sha256(token), userId, expires.toISOString()),
+  ]);
   (await cookies()).set(SESSION_COOKIE, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
@@ -107,11 +92,15 @@ export async function currentAdmin(): Promise<string | null> {
   const token = (await cookies()).get(SESSION_COOKIE)?.value;
   if (!token) return null;
   try {
-    const sql = await adminDb();
-    const [row] = await sql`
-      SELECT u.username FROM admin_sessions s JOIN admin_users u ON u.id = s.user_id
-      WHERE s.token_hash = ${sha256(token)} AND s.expires_at > now()`;
-    return (row?.username as string) ?? null;
+    const db = await adminDb();
+    const row = await db
+      .prepare(
+        `SELECT u.username FROM admin_sessions s JOIN admin_users u ON u.id = s.user_id
+         WHERE s.token_hash = ?1 AND s.expires_at > ?2`,
+      )
+      .bind(sha256(token), nowIso())
+      .first<{ username: string }>();
+    return row?.username ?? null;
   } catch (e) {
     console.error("[admin] session check failed", e);
     return null;
@@ -124,8 +113,8 @@ export async function endSession() {
   const token = store.get(SESSION_COOKIE)?.value;
   if (token) {
     try {
-      const sql = await adminDb();
-      await sql`DELETE FROM admin_sessions WHERE token_hash = ${sha256(token)}`;
+      const db = await adminDb();
+      await db.prepare(`DELETE FROM admin_sessions WHERE token_hash = ?1`).bind(sha256(token)).run();
     } catch (e) {
       console.error("[admin] logout cleanup failed", e);
     }
