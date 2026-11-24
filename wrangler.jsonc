@@ -11,6 +11,8 @@
     { "binding": "DB", "database_name": "indostage", "database_id": "b4b4a46a-3b27-40bc-8040-6865a0f324ad" }
   ],
   "observability": { "enabled": true },
+  // indostage.in → www by a Redirect Rule on the zone (the site's address is www, src/lib/site.ts).
+  "routes": [{ "pattern": "www.indostage.in", "custom_domain": true }],
   "workers_dev": true,
   "preview_urls": false
 }
